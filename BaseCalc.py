@@ -1,11 +1,7 @@
- #!/virtualenv/Code/GUI.py
- # coding: utf-8
- # 01-01-GUI
- # GUI Calculatrice
  # Jeremy Bouchard
  # Emile Belanger
- # 2016/01/25
- # Pour executer, utiliser la commande : python GUI.py
+ # 2016/02/15
+ # Pour executer, utiliser la commande : python BaseCalc.py
 
 from tkinter import *
 from tkinter.messagebox import *
@@ -17,6 +13,7 @@ class GUI:
     dot = 0
     negative = 0
     temp = 0
+    lastOperation = ""
 
     def __init__(self, master):
         self.master = master
@@ -136,7 +133,7 @@ class GUI:
             command = lambda : self.getClicked("="))
         buttonEq.grid(column = 3, row = 5, rowspan = 2, sticky=W+E+N+S)
 
-        master.bind("<Key>",self.getKeyboard)
+        master.bind("<Key>", self.getKeyboard)
 
     def showHistory(self):
         showinfo("Historique", "Affichage de l'historique")
@@ -166,6 +163,57 @@ class GUI:
         or event.char == "0" or event.char == "." or event.char == "c"):
             self.addToEquation(event.char)
 
+    def doOperation(self, key):
+        if (key == "+"):
+            self.last = self.current
+            self.resetCurrent()
+            self.lastOperation = "+"
+        if (key == "-"):
+            self.last = self.current
+            self.resetCurrent()
+            self.lastOperation = "-"
+        if (key == "*"):
+            self.last = self.current
+            self.resetCurrent()
+            self.lastOperation = "*"
+        if (key == "/"):
+            self.last = self.current
+            self.resetCurrent()
+            self.lastOperation = "/"
+        if (key == "="):
+            if (self.lastOperation == "+"):
+                if (isinstance(self.last, float) or
+                isinstance(self.current, float) or
+                isinstance(self.current, str)):
+                    self.current = float(self.current) + float(self.last)
+                else:
+                    self.current = int(self.current) + int(self.last)
+                self.lastOperation = ""
+            if (self.lastOperation == "-"):
+                if (isinstance(self.last, float) or
+                isinstance(self.current, float) or
+                isinstance(self.current, str)):
+                    self.current = float(self.last) - float(self.current)
+                else:
+                    self.current = int(self.last) - int(self.current)
+                self.lastOperation = ""
+            if (self.lastOperation == "*"):
+                if (isinstance(self.last, float) or
+                isinstance(self.current, float) or
+                isinstance(self.current, str)):
+                    self.current = float(self.current) * float(self.last)
+                else:
+                    self.current = int(self.current) * int(self.last)
+                self.lastOperation = ""
+            if (self.lastOperation == "/"):
+                if (isinstance(self.last, float) or
+                isinstance(self.current, float) or
+                isinstance(self.current, str)):
+                    self.current = float(self.last) / float(self.current)
+                else:
+                    self.current = int(self.last) / int(self.current)
+                self.lastOperation = ""
+
     def addToEquation(self, key):
         if not (key == "-" or key == "+" or key == "=" or key == "/"
         or key == "*" or key == "C" or key == "c"):
@@ -188,9 +236,7 @@ class GUI:
         # Add the digits but keep to data float or int
 
         if (key == "c" or key == "C"):
-            self.current = 0
-            self.dot = 0
-            self.negative = 0
+            self.resetCurrent()
         # Clear the data
 
         if (key == "."):
@@ -203,18 +249,27 @@ class GUI:
                 self.negative = 0
         # Change to negative value if starts with 0
 
-        if (isinstance(self.current, int) or isinstance(self.current, float)):
-            if (self.negative == 1 and self.current >= 0):
-                if (self.temp == 1):
-                    self.current = 0 - self.current
-                    self.temp = 0
-                if (key == "."):
-                    self.temp = 1
-                self.current = 0 - self.current
+        if (self.negative == 1 and float(self.current) > 0):
+            if (isinstance(self.current, int)):
+                self.current = 0 - int(self.current)
+            else:
+                self.current = 0 - float(self.current)
+        # Change to negative if actually negative
+
+        if ((key == "-" and self.current == 0) or key == "+" or key == "=" or key == "/"
+        or key == "*"):
+            self.doOperation(key)
+
+    def resetCurrent(self):
+        self.current = 0
+        self.dot = 0
+        self.negative = 0
+        self.temp = 0
+        self.lastOperation = 0
 
     def showNumber(self):
         self.display.itemconfig(self.text, text = self.current)
-        root.after(10, self.showNumber)
+        root.after(100, self.showNumber)
 
 if __name__ == "__main__":
 
