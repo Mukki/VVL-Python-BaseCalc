@@ -14,6 +14,7 @@ class GUI:
     negative = 0
     temp = 0
     lastOperation = ""
+    history = ""
 
     def __init__(self, master):
         self.master = master
@@ -45,7 +46,7 @@ class GUI:
         self.display = Canvas(master, bg = "black", width = 400, height = 100,
             highlightthickness = 0)
         self.text = self.display.create_text(390, 52, fill = "white",
-            anchor = "e", font = "Helvetica -72")
+            anchor = "e", font = "Helvetica -40")
         self.display.grid(row = 0, column = 0, columnspan = 4, rowspan = 2)
 
         buttonC = Button(master, height = 3, text = "C",
@@ -136,13 +137,14 @@ class GUI:
         master.bind("<Key>", self.getKeyboard)
 
     def showHistory(self):
-        showinfo("Historique", "Affichage de l'historique")
+        showinfo("Historique", "Historique des calculs\n"+
+        self.history)
 
     def printHistory(self):
         showinfo("Impression", "Impression en cours")
 
     def getHelp(self):
-        showinfo("Aide", "L'aide vas ici")
+        showinfo("Aide", "L'aide va ici")
 
     def clearHistory(self):
         showinfo("Historique", "Effacement en cours")
@@ -152,6 +154,10 @@ class GUI:
             "Copyright © 2017 Jérémy Bouchard & Émile Bélanger\n\n")
 
     def getClicked(self, pressed):
+        if not (pressed == "="):
+            self.history += pressed
+            if (pressed == "C" or pressed == "c"):
+                self.history += "\n"
         self.addToEquation(pressed)
 
     def getKeyboard(self, event):
@@ -161,6 +167,10 @@ class GUI:
         or event.char == "-" or event.char == "+" or event.char == "="
         or event.char == "/" or event.char == "*" or event.char == "C"
         or event.char == "0" or event.char == "." or event.char == "c"):
+            if not (event.char == "="):
+                self.history += event.char
+                if (event.char == "C" or event.char == "c"):
+                    self.history += "\n"
             self.addToEquation(event.char)
 
     def doOperation(self, key):
@@ -184,34 +194,54 @@ class GUI:
             if (self.lastOperation == "+"):
                 if (isinstance(self.last, float) or
                 isinstance(self.current, float) or
-                isinstance(self.current, str)):
+                isinstance(self.current, str) or
+                isinstance(self.last, str)):
                     self.current = float(self.current) + float(self.last)
                 else:
                     self.current = int(self.current) + int(self.last)
+                self.history += key
+                self.history += str(self.current)
+                self.history += "\n"
+                self.negative = 0
                 self.lastOperation = ""
             if (self.lastOperation == "-"):
                 if (isinstance(self.last, float) or
                 isinstance(self.current, float) or
-                isinstance(self.current, str)):
+                isinstance(self.current, str) or
+                isinstance(self.last, str)):
                     self.current = float(self.last) - float(self.current)
                 else:
                     self.current = int(self.last) - int(self.current)
+                self.history += key
+                self.history += str(self.current)
+                self.history += "\n"
                 self.lastOperation = ""
+                self.negative = 0
             if (self.lastOperation == "*"):
                 if (isinstance(self.last, float) or
                 isinstance(self.current, float) or
-                isinstance(self.current, str)):
+                isinstance(self.current, str) or
+                isinstance(self.last, str)):
                     self.current = float(self.current) * float(self.last)
                 else:
                     self.current = int(self.current) * int(self.last)
+                self.history += key
+                self.history += str(self.current)
+                self.history += "\n"
+                self.negative = 0
                 self.lastOperation = ""
             if (self.lastOperation == "/"):
                 if (isinstance(self.last, float) or
                 isinstance(self.current, float) or
-                isinstance(self.current, str)):
+                isinstance(self.current, str) or
+                isinstance(self.last, str)):
                     self.current = float(self.last) / float(self.current)
                 else:
                     self.current = int(self.last) / int(self.current)
+                self.history += key
+                self.history += str(self.current)
+                self.history += "\n"
+                self.negative = 0
                 self.lastOperation = ""
 
     def addToEquation(self, key):
@@ -220,7 +250,7 @@ class GUI:
         # To create the number
 
             if (key != "." or (key == "." and self.dot == 0)):
-                if (len(str(self.current)) < 9):
+                if (len(str(self.current)) < 17):
                     if (self.current == 0 and key != "."):
                         if (key == "0"):
                             self.current = int(0)
@@ -256,8 +286,8 @@ class GUI:
                 self.current = 0 - float(self.current)
         # Change to negative if actually negative
 
-        if ((key == "-" and self.current == 0) or key == "+" or key == "=" or key == "/"
-        or key == "*"):
+        if ((key == "-" and self.current != 0) or key == "+"
+        or key == "=" or key == "/" or key == "*"):
             self.doOperation(key)
 
     def resetCurrent(self):
