@@ -137,17 +137,29 @@ class GUI:
         master.bind("<Key>", self.getKeyboard)
 
     def showHistory(self):
-        showinfo("Historique", "Historique des calculs\n"+
-        self.history)
+        showinfo("Historique", "Historique des calculs\n" + self.history)
 
     def printHistory(self):
-        showinfo("Impression", "Impression en cours")
+        showinfo("Impression", "L'historique suivant sera imprimé :\n"+
+        self.history)
 
     def getHelp(self):
-        showinfo("Aide", "L'aide va ici")
+        showinfo("Aide", "Utilisation de la calculatrice :\n\n\n"+
+            "1- L'entrée peut se faire au clavier ou avec la souris\n\n"+
+            "2- Pour afficher le résultat, appuyer sur '='\n\n"+
+            "3- Pour effacer le calcul en cours, appuyer sur 'c'\n\n"+
+            "4- Il est possible de  poursuivre un calcul deja en cours\n"+
+            "    après l'ajout d'un opérateur, l'opérateur est alors\n"+
+            "    ajouté au dernier résultat.\n\n"+
+            "5- Pour calculer avec un nombre négatif, appuyer sur '-'\n"+
+            "    avant le nombre, par exemple 3--4=-1 et -0.5+1=0.5\n\n"+
+            "6- Affichage de l'historique : Option->Historique\n\n"+
+            "7- Suppression de l'historique : Option->Effacer l'historique\n\n"+
+            "8- Impression de l'historique : Option->Imprimer\n\n")
 
     def clearHistory(self):
-        showinfo("Historique", "Effacement en cours")
+        showinfo("Historique", "Historique effacé")
+        self.history = ""
 
     def getAbout(self):
         showinfo("À propos de ce logiciel", "BaseCalc v1.0.3\n"+
