@@ -7,9 +7,10 @@ from tkinter import *
 from tkinter.messagebox import *
 
 class GUI:
+    unit = 0
+    decimal = 0
     current = 0
     last = 0
-    power = 0
     dot = 0
     negative = 0
     temp = 0
@@ -136,6 +137,10 @@ class GUI:
 
         master.bind("<Key>", self.getKeyboard)
 
+        self.current = round(float(self.current), 2)
+        self.last = round(float(self.last), 2)
+        self.temp  = round(float(self.temp), 2)
+
     def showHistory(self):
         showinfo("Historique", "Historique des calculs\n" + self.history)
         return 0
@@ -175,7 +180,7 @@ class GUI:
             self.history += pressed #Add the key pressed to history
             if (pressed == "C" or pressed == "c"):
                 self.history += "\n" #Switch line in history
-        self.addToEquation(pressed) #Go do the real stuff
+        self.doCalculation(pressed) #Go do the real stuff
         return 0
 
     def getKeyboard(self, event):
@@ -188,121 +193,97 @@ class GUI:
             self.getClicked(event.char) #Pass the keyboard entry to the rest
         return 0
 
-    def doOperation(self, key):
-        if (key == "+" or key == "-" or key == "*" or key == "/"):
-            self.last = self.current
-            self.resetCurrent()
-            self.lastOperation = key
-
-        if (key == "="):
-            if (self.lastOperation == "+"):
-                if (isinstance(self.last, float) or
-                isinstance(self.current, float) or
-                isinstance(self.current, str) or
-                isinstance(self.last, str)):
-                    self.current = float(self.current) + float(self.last)
-                else:
-                    self.current = int(self.current) + int(self.last)
-                self.history += key
-                self.history += str(self.current)
-                self.history += "\n"
-                self.negative = 0
-                self.lastOperation = ""
-            if (self.lastOperation == "-"):
-                if (isinstance(self.last, float) or
-                isinstance(self.current, float) or
-                isinstance(self.current, str) or
-                isinstance(self.last, str)):
-                    self.current = float(self.last) - float(self.current)
-                else:
-                    self.current = int(self.last) - int(self.current)
-                self.history += key
-                self.history += str(self.current)
-                self.history += "\n"
-                self.lastOperation = ""
-                self.negative = 0
-            if (self.lastOperation == "*"):
-                if (isinstance(self.last, float) or
-                isinstance(self.current, float) or
-                isinstance(self.current, str) or
-                isinstance(self.last, str)):
-                    self.current = float(self.current) * float(self.last)
-                else:
-                    self.current = int(self.current) * int(self.last)
-                self.history += key
-                self.history += str(self.current)
-                self.history += "\n"
-                self.negative = 0
-                self.lastOperation = ""
-            if (self.lastOperation == "/"):
-                if (isinstance(self.last, float) or
-                isinstance(self.current, float) or
-                isinstance(self.current, str) or
-                isinstance(self.last, str)):
-                    self.current = float(self.last) / float(self.current)
-                else:
-                    self.current = int(self.last) / int(self.current)
-                self.history += key
-                self.history += str(self.current)
-                self.history += "\n"
-                self.negative = 0
-                self.lastOperation = ""
-
-    def addToEquation(self, key):
-        if not (key == "-" or key == "+" or key == "=" or key == "/"
-        or key == "*" or key == "C" or key == "c"):
-        # To create the number
-
-            if (key != "." or (key == "." and self.dot == 0)):
-                if (len(str(self.current)) < 17):
-                    if (self.current == 0 and key != "."):
-                        if (key == "0"):
-                            self.current = int(0)
-                        else:
-                            self.current = int(key)
-        # To add digits correctly with decimal dot
+    def concatenateCurrent(self, key):
+        if (key != "." or (key == "." and self.dot == 0)): #Dot "mutex"
+            if (len(str(self.current)) < 17): #Max lenght printable
+                if (self.current == 0 and key != "."):
+                    if (key == "0"): #If there's nothing in the current
+                        self.unit = float(0)
                     else:
-                        self.current = str(self.current) + key
-                        if (isinstance(self.current, int)):
-                            self.current = int(self.current)
-                        if (isinstance(self.current, float)):
-                            self.current = float(self.current)
-        # Add the digits but keep to data float or int
+                        self.unit = int(key)
+                elif (key == "."): #Set the dot "mutex" to yes
+                    self.dot = 1
+                else:
+                    if (self.dot == 0): #Do stuff related to unit
+                        self.unit = str(self.unit) + str(key)
+                    elif (self.decimal == 0): #Do suff related to decimal
+                        self.decimal = str(key)
+                    else:
+                        self.decimal = str(self.decimal) + str(key)
+                value = str(self.unit) + "." + str(self.decimal) #concatenate
+        return float(value)
 
-        if (key == "c" or key == "C"):
-            self.resetCurrent()
-        # Clear the data
-
-        if (key == "."):
-            self.dot = 1
-
-        if (key == "-" and self.current == 0):
+    def resolveNegative(self):
+        if (self.current == 0): #Change negative "mutex"
             if (self.negative == 0):
                 self.negative = 1
             else:
                 self.negative = 0
-        # Change to negative value if starts with 0
 
-        if (self.negative == 1 and float(self.current) > 0):
-            if (isinstance(self.current, int)):
-                self.current = 0 - int(self.current)
-            else:
-                self.current = 0 - float(self.current)
-        # Change to negative if actually negative
+        if (float(self.current) > 0): #Invert the number
+            self.current = 0 - self.current
+
+    def add(self, a, b):
+        return float(a) + float(b)
+
+    def sub(self, a, b):
+        return float(b) - float(a)
+
+    def mul(self, a, b):
+        return float(a) * float(b)
+
+    def div(self, a, b):
+        return float(b) / float(a)
+
+    def doCalculation(self, key):
+        if not (key == "-" or key == "+" or key == "=" or key == "/"
+        or key == "*" or key == "C" or key == "c"):
+            self.current = self.concatenateCurrent(key)
+
+        if (key == "c" or key == "C"):
+            self.resetCurrent()
+
+        if (key == "-" or self.negative == 1):
+            self.resolveNegative()
 
         if ((key == "-" and self.current != 0) or key == "+"
         or key == "=" or key == "/" or key == "*"):
-            self.doOperation(key)
+            if (key == "+" or key == "-" or key == "*" or key == "/"):
+                self.last = self.current
+                self.resetCurrent()
+                self.lastOperation = key
+
+            if (key == "="):
+                if (self.lastOperation == "+"):
+                    self.current = self.add(self.current, self.last)
+
+                if (self.lastOperation == "-"):
+                    self.current = self.sub(self.current, self.last)
+
+                if (self.lastOperation == "*"):
+                    self.current = self.mul(self.current, self.last)
+
+                if (self.lastOperation == "/"):
+                    self.current = self.div(self.current, self.last)
+
+                self.history += key
+                self.history += str(self.current)
+                self.history += "\n"
+                self.negative = 0
+                self.lastOperation = ""
 
     def resetCurrent(self):
-        self.current = 0
+        self.current = float(0)
         self.dot = 0
         self.negative = 0
-        self.temp = 0
+        self.temp = float(0)
         self.lastOperation = 0
+        self.unit = 0
+        self.decimal = 0
         return 0
 
     def showNumber(self):
+        self.current = round(self.current, 2)
         self.display.itemconfig(self.text, text = self.current)
         root.after(100, self.showNumber)
         return 0
