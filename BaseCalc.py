@@ -1,6 +1,6 @@
  # Jeremy Bouchard
  # Emile Belanger
- # 2016/02/15
+ # 2016/02/22
  # Pour executer, utiliser la commande : python BaseCalc.py
 
 from tkinter import *
@@ -138,10 +138,12 @@ class GUI:
 
     def showHistory(self):
         showinfo("Historique", "Historique des calculs\n" + self.history)
+        return 0
 
     def printHistory(self):
         showinfo("Impression", "L'historique suivant sera imprimé :\n"+
         self.history)
+        return 0
 
     def getHelp(self):
         showinfo("Aide", "Utilisation de la calculatrice :\n\n\n"+
@@ -152,25 +154,29 @@ class GUI:
             "    après l'ajout d'un opérateur, l'opérateur est alors\n"+
             "    ajouté au dernier résultat.\n\n"+
             "5- Pour calculer avec un nombre négatif, appuyer sur '-'\n"+
-            "    avant le nombre, par exemple 3--4=-1 et -0.5+1=0.5\n\n"+
+            "    avant le nombre, par exemple 3+-4=-1 et -0.5+1=0.5\n\n"+
             "6- Affichage de l'historique : Option->Historique\n\n"+
             "7- Suppression de l'historique : Option->Effacer l'historique\n\n"+
             "8- Impression de l'historique : Option->Imprimer\n\n")
+        return 0
 
     def clearHistory(self):
         showinfo("Historique", "Historique effacé")
         self.history = ""
+        return 0
 
     def getAbout(self):
-        showinfo("À propos de ce logiciel", "BaseCalc v1.0.3\n"+
+        showinfo("À propos de ce logiciel", "BaseCalc\n"+
             "Copyright © 2017 Jérémy Bouchard & Émile Bélanger\n\n")
+        return 0
 
     def getClicked(self, pressed):
         if not (pressed == "="):
-            self.history += pressed
+            self.history += pressed #Add the key pressed to history
             if (pressed == "C" or pressed == "c"):
-                self.history += "\n"
-        self.addToEquation(pressed)
+                self.history += "\n" #Switch line in history
+        self.addToEquation(pressed) #Go do the real stuff
+        return 0
 
     def getKeyboard(self, event):
         if (event.char == "1" or event.char == "2" or event.char == "3"
@@ -179,29 +185,15 @@ class GUI:
         or event.char == "-" or event.char == "+" or event.char == "="
         or event.char == "/" or event.char == "*" or event.char == "C"
         or event.char == "0" or event.char == "." or event.char == "c"):
-            if not (event.char == "="):
-                self.history += event.char
-                if (event.char == "C" or event.char == "c"):
-                    self.history += "\n"
-            self.addToEquation(event.char)
+            self.getClicked(event.char) #Pass the keyboard entry to the rest
+        return 0
 
     def doOperation(self, key):
-        if (key == "+"):
+        if (key == "+" or key == "-" or key == "*" or key == "/"):
             self.last = self.current
             self.resetCurrent()
-            self.lastOperation = "+"
-        if (key == "-"):
-            self.last = self.current
-            self.resetCurrent()
-            self.lastOperation = "-"
-        if (key == "*"):
-            self.last = self.current
-            self.resetCurrent()
-            self.lastOperation = "*"
-        if (key == "/"):
-            self.last = self.current
-            self.resetCurrent()
-            self.lastOperation = "/"
+            self.lastOperation = key
+
         if (key == "="):
             if (self.lastOperation == "+"):
                 if (isinstance(self.last, float) or
@@ -308,10 +300,12 @@ class GUI:
         self.negative = 0
         self.temp = 0
         self.lastOperation = 0
+        return 0
 
     def showNumber(self):
         self.display.itemconfig(self.text, text = self.current)
         root.after(100, self.showNumber)
+        return 0
 
 if __name__ == "__main__":
 
