@@ -7,9 +7,10 @@ from tkinter import *
 from tkinter.messagebox import *
 
 class GUI:
+    unit = 0
+    decimal = 0
     current = 0
     last = 0
-    power = 0
     dot = 0
     negative = 0
     temp = 0
@@ -136,6 +137,10 @@ class GUI:
 
         master.bind("<Key>", self.getKeyboard)
 
+        self.current = round(float(self.current), 2)
+        self.last = round(float(self.last), 2)
+        self.temp  = round(float(self.temp), 2)
+
     def showHistory(self):
         showinfo("Historique", "Historique des calculs\n" + self.history)
         return 0
@@ -175,7 +180,7 @@ class GUI:
             self.history += pressed #Add the key pressed to history
             if (pressed == "C" or pressed == "c"):
                 self.history += "\n" #Switch line in history
-        self.addToEquation(pressed) #Go do the real stuff
+        self.doCalculation(pressed) #Go do the real stuff
         return 0
 
     def getKeyboard(self, event):
@@ -187,6 +192,18 @@ class GUI:
         or event.char == "0" or event.char == "." or event.char == "c"):
             self.getClicked(event.char) #Pass the keyboard entry to the rest
         return 0
+
+    def concatenateCurrent(self, key):
+        if (key != "." or (key == "." and self.dot == 0)): #Dot "mutex"
+            if (len(str(self.current)) < 17): #Max lenght printable
+                if (self.current == 0 and key != "."):
+                    if (key == "0"): #If there's nothing in the current
+                        temp = float(0)
+                    else:
+                        temp = float(key)
+                else:
+                    temp = str(self.current) + str(key) #concatenate
+        return float(temp)
 
     def doOperation(self, key):
         if (key == "+" or key == "-" or key == "*" or key == "/"):
@@ -248,30 +265,13 @@ class GUI:
                 self.negative = 0
                 self.lastOperation = ""
 
-    def addToEquation(self, key):
+    def doCalculation(self, key):
         if not (key == "-" or key == "+" or key == "=" or key == "/"
         or key == "*" or key == "C" or key == "c"):
-        # To create the number
-
-            if (key != "." or (key == "." and self.dot == 0)):
-                if (len(str(self.current)) < 17):
-                    if (self.current == 0 and key != "."):
-                        if (key == "0"):
-                            self.current = int(0)
-                        else:
-                            self.current = int(key)
-        # To add digits correctly with decimal dot
-                    else:
-                        self.current = str(self.current) + key
-                        if (isinstance(self.current, int)):
-                            self.current = int(self.current)
-                        if (isinstance(self.current, float)):
-                            self.current = float(self.current)
-        # Add the digits but keep to data float or int
+            self.current = self.concatenateCurrent(key)
 
         if (key == "c" or key == "C"):
             self.resetCurrent()
-        # Clear the data
 
         if (key == "."):
             self.dot = 1
@@ -295,10 +295,10 @@ class GUI:
             self.doOperation(key)
 
     def resetCurrent(self):
-        self.current = 0
+        self.current = float(0)
         self.dot = 0
         self.negative = 0
-        self.temp = 0
+        self.temp = float(0)
         self.lastOperation = 0
         return 0
 
