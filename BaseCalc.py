@@ -349,7 +349,7 @@ class GUI:
         1.25
         >>> gui.div(4.5, 9)
         2.0
-        >>> gui.div(9, -4.5)
+        >>> gui.div(2.4, -1.2)
         -0.5
         """
         return float(b) / float(a)
