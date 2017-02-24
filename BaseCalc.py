@@ -23,6 +23,7 @@ class GUI:
         To  initialilze the GUI with all the buttons and such.
 
         Since it's a constructor, it shouldn't return anything.
+
         """
         self.master = master
 
@@ -155,6 +156,7 @@ class GUI:
 
 
         Should always return 0.
+
         """
         showinfo("Historique", "Historique des calculs\n" + self.history)
         return 0
@@ -166,6 +168,7 @@ class GUI:
         We are printing in a window since we don't have access to a printer.
 
         Should always return 0.
+
         """
         showinfo("Impression", "L'historique suivant sera imprimé :\n"+
         self.history)
@@ -178,6 +181,7 @@ class GUI:
 
 
         Should always return 0.
+
         """
         showinfo("Aide", "Utilisation de la calculatrice :\n\n\n"+
             "1- L'entrée peut se faire au clavier ou avec la souris\n\n"+
@@ -199,6 +203,7 @@ class GUI:
         Pretty classic and self-explanatory.
 
         Should always return 0.
+
         """
         showinfo("Historique", "Historique effacé")
         self.history = ""
@@ -210,6 +215,7 @@ class GUI:
         Pretty classic and self-explanatory.
 
         Should always return 0.
+
         """
         showinfo("À propos de ce logiciel", "BaseCalc\n"+
             "Copyright © 2017 Jérémy Bouchard & Émile Bélanger\n\n")
@@ -221,6 +227,7 @@ class GUI:
         It calls doCalculation after the key is pressed.
 
         It should always return 0.
+
         """
         if not (pressed == "="):
             self.history += pressed #Add the key pressed to history
@@ -236,6 +243,7 @@ class GUI:
         if it's a valid one. It then calls getClicked with that input.
 
         Should always return 0.
+
         """
         if (event.char == "1" or event.char == "2" or event.char == "3"
         or event.char == "4" or event.char == "5" or event.char == "6"
@@ -254,7 +262,26 @@ class GUI:
 
         The unit, decimal and dot is by default 0.
 
-        Should always return 0.
+        >>> gui.resetCurrent()
+        0
+        >>> gui.unit = 3
+        >>> gui.concatenateCurrent("2", "3")
+        32.0
+
+        >>> gui.resetCurrent()
+        0
+        >>> gui.unit = 3
+        >>> gui.decimal = 2
+        >>> gui.dot = 1
+        >>> gui.concatenateCurrent("2", "3.2")
+        3.22
+
+        >>> gui.resetCurrent()
+        0
+        >>> gui.dot = 1
+        >>> gui.concatenateCurrent("1", "0.0")
+        0.1
+
         """
         if (key != "." or (key == "." and self.dot == 0)): #Dot "mutex"
             if (len(str(current)) < 17): #Max lenght printable
@@ -284,6 +311,7 @@ class GUI:
         The unit, decimal and dot is by default 0.
 
         Should always return 0.
+
         """
         if (self.current == 0): #Change negative "mutex"
             if (self.negative == 0):
@@ -293,6 +321,8 @@ class GUI:
 
         if (float(self.current) > 0 and self.negative == 1): #Invert the number
             self.current = 0 - self.current
+
+        return 0
 
     def add(self, a, b):
         """Function that adds two elements and return the sum
@@ -305,6 +335,7 @@ class GUI:
         -9.0
         >>> gui.add(4.56, 7.61)
         12.17
+
         """
         return float(a) + float(b)
 
@@ -317,6 +348,7 @@ class GUI:
         5.0
         >>> gui.sub(-4, -5)
         -1.0
+
         """
         return float(b) - float(a)
 
@@ -333,6 +365,7 @@ class GUI:
         34.7016
         >>> gui.mul(-4.56, 7.61)
         -34.7016
+
         """
         return float(a) * float(b)
 
@@ -351,6 +384,7 @@ class GUI:
         2.0
         >>> gui.div(2.4, -1.2)
         -0.5
+
         """
         return float(b) / float(a)
 
@@ -361,6 +395,7 @@ class GUI:
         parameters and to modify the current depending on user input.
 
         Should always return 0.
+
         """
         if not (key == "-" or key == "+" or key == "=" or key == "/"
         or key == "*" or key == "C" or key == "c"):
@@ -405,6 +440,7 @@ class GUI:
         Reset all values, internal, current, ect...
 
         Should always return 0.
+
         """
         self.current = float(0)
         self.dot = 0
@@ -423,6 +459,7 @@ class GUI:
         do it again.
 
         Should always return 0.
+
         """
         self.current = round(self.current, 2)
         self.display.itemconfig(self.text, text = self.current)
